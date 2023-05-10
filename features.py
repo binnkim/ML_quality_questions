@@ -3,8 +3,12 @@ from scipy.stats import multinomial
 from data_sources import *
 
 
-def __get_rank():
-    return 
+def __get_rank(df, df_key, rank_ascending=False):
+    df['ranking'] = df[df_key].rank(method='min', ascending=rank_ascending) \
+                              .astype('int16') 
+    df.sort_values(by='ranking', ascending=True, inplace=True) 
+    return df
+
 
 def simple_mean_confidence():
     train_data = get_train_data()
@@ -17,7 +21,6 @@ def simple_mean_confidence():
     # Get mean confidence for all questions
     mean_all_questions = questions_with_mean['Confidence'].mean()
 
-    # Fill in na with mean confidence for all questions
     # There are 948 questions (unique)
     df = pd.DataFrame({'QuestionId':range(948), 'Confidence':mean_all_questions})
     df['Confidence'] = questions_with_mean['Confidence']
@@ -26,9 +29,12 @@ def simple_mean_confidence():
     # Rank
     # Assume the higher confidence is the better
     # Ranking sorted should be ascending
-    df['ranking'] = df['Confidence'].rank(method='min', ascending=False).astype('int16') 
-    df.sort_values(by='ranking', ascending=True, inplace=True) 
-    return df
+    return __get_rank(df, 'Confidence')
+
+
+def simple_mean_confidence_reversed():
+    df = simple_mean_confidence().rename(columns={'ranking': 'PrevRank'})
+    return __get_rank(df, 'PrevRank')
 
 
 def simple_correct_rate():
@@ -40,11 +46,14 @@ def simple_correct_rate():
     questions_with_mean = merged_data.groupby('QuestionId')[['IsCorrect']].mean().rename(columns={'IsCorrect': 'CorrectRate'})
 
     df = questions_with_mean
-    df['ranking'] = df['CorrectRate'].rank(method='min', ascending=False).astype('int16')
-    df.sort_values(by='ranking', ascending=True, inplace=True)
     df.reset_index(inplace=True)
     df.rename(columns={'index': 'QuestionId'}, inplace=True)
-    return df
+    return __get_rank(df, 'CorrectRate')
+
+
+def simple_correct_rate_reversed():
+    df = simple_correct_rate().rename(columns={'ranking': 'PrevRank'})
+    return __get_rank(df, 'PrevRank')
 
 
 def half_correct_rate():
@@ -58,11 +67,10 @@ def half_correct_rate():
     # Closer to 0.5 is the better (the lower value is the better)
     df = questions_with_mean
     df['CloserValue'] = (0.5 - df['CorrectRate']).abs() * 2
-    df['ranking'] = df['CloserValue'].rank(method='min', ascending=True).astype('int16')
-    df.sort_values(by='ranking', ascending=True, inplace=True)
+    
     df.reset_index(inplace=True)
     df.rename(columns={'index': 'QuestionId'}, inplace=True)    
-    return df
+    return __get_rank(df, 'CloserValue', rank_ascending=True)
     
 
 def appropriateness():
@@ -86,8 +94,4 @@ def appropriateness():
     df['QuestionId'] = question_ids
     df['Appr'] = apprs
     
-    df['ranking'] = df['Appr'].rank(method='min', ascending=False).astype('int16')
-    df.sort_values(by='ranking', ascending=True, inplace=True)
-    return df
-
-print(appropriateness())
+    return __get_rank(df, 'Appr')

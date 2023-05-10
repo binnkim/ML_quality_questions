@@ -1,3 +1,4 @@
+
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -63,7 +64,9 @@ def run(template):
 
 FEATURE_LIST = [
     'simple_mean_confidence',
+    'simple_mean_confidence_reversed',
     'simple_correct_rate',
+    'simple_correct_rate_reversed',
     'half_correct_rate',
     'appropriateness',
 ]
