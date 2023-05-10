@@ -56,10 +56,22 @@ eval_test['preference'] = calc_preference(eval_test['score'])
 eval_test.head()
 
 # evaluate
-
+print('==================================')
+print('simple mean confidence model')
 template = features.simple_mean_confidence_model()
 print('evaluation', evaluate(eval_validation, template))
 print('evaluation', evaluate(eval_test, template))
 
 print('evaluation2', evaluate2(eval_validation, template))
 print('evaluation2', evaluate2(eval_test, template))
+
+print('==================================')
+print('simple correct rate model')
+template = features.simple_correct_rate_model()
+print('evaluation', evaluate(eval_validation, template))
+print('evaluation', evaluate(eval_test, template))
+
+print('evaluation2', evaluate2(eval_validation, template))
+print('evaluateion2', evaluate2(eval_test, template))
+
+
