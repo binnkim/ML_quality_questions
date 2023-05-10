@@ -3,6 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import features
 
+
 def calc_preference(scores):
     preference = np.ones(len(scores), dtype=int)
 
@@ -11,7 +12,8 @@ def calc_preference(scores):
 
     return list(preference)
 
-def evaluate(truth, submission):
+
+def __evaluate(truth, truth_preference, submission):
     left = list(truth['left'])
     right = list(truth['right'])
 
@@ -19,7 +21,6 @@ def evaluate(truth, submission):
     submission_right = []
     submission_preference = []
     evaluation = []
-    truth_preference = list(truth['preference'])
 
     length = len(left)
     for idx in range(length):
@@ -32,6 +33,23 @@ def evaluate(truth, submission):
         evaluation.append(1 if preference == truth_preference[idx] else 0)
         
     return sum(evaluation) / length
+
+
+def evaluate(truth, submission):
+    return __evaluate(truth, calc_preference(eval_validation['score']), submission)
+
+
+def evaluate2(truth, submission):
+    evaluation_with_panels = [
+        __evaluate(truth, truth['T1_ALR'], submission),
+        __evaluate(truth, truth['T2_CL'], submission),
+        __evaluate(truth, truth['T3_GF'], submission),
+        __evaluate(truth, truth['T4_MQ'], submission),
+        __evaluate(truth, truth['T5_NS'], submission)
+    ]
+    return max(evaluation_with_panels)
+    
+       
 
 
 eval_validation = pd.read_csv('../data/test_data/quality_response_remapped_public.csv')
@@ -50,3 +68,5 @@ template = features.simple_confidence_average_model()
 print('evaluation', evaluate(eval_validation, template))
 print('evaluation', evaluate(eval_test, template))
 
+print('evaluation2', evaluate2(eval_validation, template))
+print('evaluation2', evaluate2(eval_test, template))
