@@ -6,7 +6,7 @@ from data_sources import *
 def __get_rank():
     return 
 
-def simple_mean_confidence_model():
+def simple_mean_confidence():
     train_data = get_train_data()
     answer_data = get_answer_data()
 
@@ -31,7 +31,7 @@ def simple_mean_confidence_model():
     return df
 
 
-def simple_correct_rate_model():
+def simple_correct_rate():
     train_data = get_train_data()
     answer_data = get_answer_data()
 
@@ -47,7 +47,7 @@ def simple_correct_rate_model():
     return df
 
 
-def half_correct_rate_model():
+def half_correct_rate():
     train_data = get_train_data()
     answer_data = get_answer_data()
 

@@ -55,28 +55,22 @@ eval_test['preference'] = calc_preference(eval_test['score'])
 
 
 def run(template):
-    print('evaluation public', evaluate(eval_validation, template))
-    print('evaluation private', evaluate(eval_test, template))
-    print('evaluation2 pulic', evaluate2(eval_validation, template))
-    print('evaluation2 private', evaluate2(eval_test, template))
+    print('evaluation (rounding) public', evaluate(eval_validation, template))
+    print('evaluation (rounding) private', evaluate(eval_test, template))
+    print('evaluation2 (max val) pulic', evaluate2(eval_validation, template))
+    print('evaluation2 (max val) private', evaluate2(eval_test, template))
 
+
+FEATURE_LIST = [
+    'simple_mean_confidence',
+    'simple_correct_rate',
+    'half_correct_rate',
+    'appropriateness',
+]
 # evaluate
-print('==================================')
-print('simple mean confidence model')
-template = features.simple_mean_confidence_model()
-run(template)
+for feature_name in FEATURE_LIST:
+    print('==================================')
+    print(feature_name)
+    run(getattr(features, feature_name)())
 
-print('==================================')
-print('simple correct rate model')
-template = features.simple_correct_rate_model()
-run(template)
 
-print('==================================')
-print('half correct rate')
-template = features.half_correct_rate_model()
-run(template)
-
-print('==================================')
-print('appropriateness')
-template = features.appropriateness()
-run(template)
