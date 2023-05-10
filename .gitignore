@@ -3,5 +3,5 @@ venv/
 \#*\#
 .DS_Store
 __pycache__/
-submission/
+submission_candidates/
 data/

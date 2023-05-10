@@ -1,6 +1,6 @@
 import pandas as pd
 
-DATA_DIR = '../data'
+DATA_DIR = './data'
 
 def get_train_data():
     return pd.read_csv(f'{DATA_DIR}/train_data/train_task_3_4.csv')

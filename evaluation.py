@@ -1,4 +1,4 @@
-
+import os
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -74,6 +74,15 @@ FEATURE_LIST = [
 for feature_name in FEATURE_LIST:
     print('==================================')
     print(feature_name)
-    run(getattr(features, feature_name)())
+    template = getattr(features, feature_name)()
+    run(template)
+
+    outdir = './submission_candidates'
+    if not os.path.exists(outdir):
+        os.mkdir(outdir)
+
+    template.to_csv(os.path.join(outdir, f'{feature_name}.csv'))
+
+print('==================================')
 
 
