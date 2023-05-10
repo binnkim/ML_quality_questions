@@ -17,22 +17,17 @@ def __evaluate(truth, truth_preference, submission):
     left = list(truth['left'])
     right = list(truth['right'])
 
-    submission_left = []
-    submission_right = []
     submission_preference = []
     evaluation = []
 
     length = len(left)
     for idx in range(length):
-        submission_left.append(left[idx])
-        submission_right.append(right[idx])
         ranking_left = submission[submission.QuestionId==left[idx]].ranking.values[0]
         ranking_right = submission[submission.QuestionId==right[idx]].ranking.values[0]
-        preference = 1 if ranking_left < ranking_right else 2
+        preference = 1 if ranking_left < ranking_right else 2 # 1 is left, 2 is right : preference means the higher quality of a question
         submission_preference.append(preference)
         evaluation.append(1 if preference == truth_preference[idx] else 0)
-        
-    return sum(evaluation) / length
+    return sum(evaluation) / len(evaluation)
 
 
 def evaluate(truth, submission):
@@ -48,8 +43,6 @@ def evaluate2(truth, submission):
         __evaluate(truth, truth['T5_NS'], submission)
     ]
     return max(evaluation_with_panels)
-    
-       
 
 
 eval_validation = pd.read_csv('../data/test_data/quality_response_remapped_public.csv')
@@ -64,7 +57,7 @@ eval_test.head()
 
 # evaluate
 
-template = features.simple_confidence_average_model()
+template = features.simple_mean_confidence_model()
 print('evaluation', evaluate(eval_validation, template))
 print('evaluation', evaluate(eval_test, template))
 

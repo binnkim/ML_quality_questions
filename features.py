@@ -1,27 +1,30 @@
 import pandas as pd
 from data_sources import *
 
-def simple_confidence_average_model():
+def simple_mean_confidence_model():
     train_data = get_train_data()
     answer_data = get_answer_data()
 
-    # merge the datasets
+    # Get mean confidence for each question
     merged_data = answer_data.merge(train_data, on='AnswerId')
+    questions_with_mean = merged_data.groupby('QuestionId')[['Confidence']].mean()
 
-    # get the average confidence for each question
-    average_conf_df = merged_data.groupby('QuestionId')[['Confidence']].mean()
-    average_confidence = average_conf_df['Confidence'].mean()
+    # Get mean confidence for all questions
+    mean_all_questions = questions_with_mean['Confidence'].mean()
 
-    # fill in any missing questions with the average confidence
-    results_df = pd.DataFrame({'QuestionId':range(0,1000), 'Confidence':average_confidence})
-    results_df['Confidence'] = average_conf_df['Confidence']
-    results_df.fillna(average_conf_df['Confidence'].mean(), inplace=True)
+    # Fill in na with mean confidence for all questions
+    # There are 948 questions (unique)
+    df = pd.DataFrame({'QuestionId':range(948), 'Confidence':mean_all_questions})
+    df['Confidence'] = questions_with_mean['Confidence']
+    df.fillna(mean_all_questions, inplace=True)
 
-    # rank the questions based on Confidence
-    results_df['ranking'] = results_df['Confidence'].rank(method='first', ascending=False).astype('int16')
-    results_df.sort_values(by='ranking', ascending=True, inplace=True)
-    results_df.drop(columns = ['Confidence'], inplace=True)  
-    return results_df
+    # Rank
+    # Assume the higher confidence is the better
+    # Ranking sorted should be ascending
+    df['ranking'] = df['Confidence'].rank(method='min', ascending=False).astype('int16') 
+    df.sort_values(by='ranking', ascending=True, inplace=True) 
+    df.drop(columns = ['Confidence'], inplace=True)
+    
+    return df
 
 
-print(simple_confidence_average_model())
