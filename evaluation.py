@@ -71,8 +71,12 @@ print('simple correct rate model')
 template = features.simple_correct_rate_model()
 run(template)
 
-
 print('==================================')
 print('half correct rate')
 template = features.half_correct_rate_model()
+run(template)
+
+print('==================================')
+print('appropriateness')
+template = features.appropriateness()
 run(template)

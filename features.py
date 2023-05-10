@@ -58,12 +58,36 @@ def half_correct_rate_model():
     # Closer to 0.5 is the better (the lower value is the better)
     df = questions_with_mean
     df['CloserValue'] = (0.5 - df['CorrectRate']).abs() * 2
-    df['ranking'] = df['CloserValue'].rank(method='min', ascending=False).astype('int16')
+    df['ranking'] = df['CloserValue'].rank(method='min', ascending=True).astype('int16')
     df.sort_values(by='ranking', ascending=True, inplace=True)
     df.reset_index(inplace=True)
     df.rename(columns={'index': 'QuestionId'}, inplace=True)    
     return df
     
 
+def appropriateness():
+    train_data = get_train_data()
+    
+    user_correct_rate_map = {}
+    for user_id, correct_rate in train_data.groupby('UserId')['IsCorrect'].mean().reset_index().values:
+        user_correct_rate_map[user_id] = correct_rate
 
-print(half_correct_rate_model())
+    train_data['UserCorrectRate'] = \
+        train_data['UserId'].map(user_correct_rate_map)
+
+    groupby_data = train_data.groupby('QuestionId')
+    question_ids = []
+    apprs = []
+    for _, (question_id, df) in enumerate(groupby_data):
+        question_ids.append(question_id)
+        apprs.append((df['IsCorrect'] - df['UserCorrectRate']).abs().mean())
+
+    df = pd.DataFrame()
+    df['QuestionId'] = question_ids
+    df['Appr'] = apprs
+    
+    df['ranking'] = df['Appr'].rank(method='min', ascending=False).astype('int16')
+    df.sort_values(by='ranking', ascending=True, inplace=True)
+    return df
+
+print(appropriateness())
