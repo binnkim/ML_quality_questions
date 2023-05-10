@@ -31,7 +31,7 @@ def __evaluate(truth, truth_preference, submission):
 
 
 def evaluate(truth, submission):
-    return __evaluate(truth, calc_preference(eval_validation['score']), submission)
+    return __evaluate(truth, calc_preference(truth['score']), submission)
 
 
 def evaluate2(truth, submission):
@@ -49,29 +49,30 @@ eval_validation = pd.read_csv('../data/test_data/quality_response_remapped_publi
 eval_validation['score'] = eval_validation.filter(regex='^T', axis=1).mean(axis=1)
 eval_validation['preference'] = calc_preference(eval_validation['score'])
 
-# TODO
 eval_test = pd.read_csv('../data/test_data/quality_response_remapped_private.csv')
 eval_test['score'] = eval_test.filter(regex='^T', axis=1).mean(axis=1)
 eval_test['preference'] = calc_preference(eval_test['score'])
-eval_test.head()
+
+
+def run(template):
+    print('evaluation public', evaluate(eval_validation, template))
+    print('evaluation private', evaluate(eval_test, template))
+    print('evaluation2 pulic', evaluate2(eval_validation, template))
+    print('evaluation2 private', evaluate2(eval_test, template))
 
 # evaluate
 print('==================================')
 print('simple mean confidence model')
 template = features.simple_mean_confidence_model()
-print('evaluation', evaluate(eval_validation, template))
-print('evaluation', evaluate(eval_test, template))
-
-print('evaluation2', evaluate2(eval_validation, template))
-print('evaluation2', evaluate2(eval_test, template))
+run(template)
 
 print('==================================')
 print('simple correct rate model')
 template = features.simple_correct_rate_model()
-print('evaluation', evaluate(eval_validation, template))
-print('evaluation', evaluate(eval_test, template))
-
-print('evaluation2', evaluate2(eval_validation, template))
-print('evaluateion2', evaluate2(eval_test, template))
+run(template)
 
 
+print('==================================')
+print('half correct rate')
+template = features.half_correct_rate_model()
+run(template)
